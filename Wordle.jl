@@ -132,7 +132,7 @@ end
 # ╔═╡ 32c339e9-4976-4e6f-8e3a-514883f3d308
 secret_word()
 
-# ╔═╡ 10b2959a-2925-4254-8954-724665099ec7
+# ╔═╡ fdf7557e-37cb-44c1-8546-c518592279bb
 function compare_words(guess)
 
 	path = joinpath(splitdir(@__FILE__)[1], "Wordle.txt")
@@ -144,7 +144,7 @@ function compare_words(guess)
 	end
 
 	if test == 0
-		println("The choosen word is not in the list.")
+		error("The choosen word is not in the list.")
 	else
 
 		w.guess = guess # Set the current guess in the mutable structure
@@ -196,7 +196,7 @@ function compare_words(guess)
 						test += 1
 					end
 				end
-				if n == test
+				if n > 1 && n == test
 					output[i] = 0
 				end
 				
@@ -211,23 +211,159 @@ function compare_words(guess)
 			end
 		end
 
-		if length(preoutput) == 1
-			(i, char) = preoutput[1]
-			output[i] = 2
-			
-		elseif length(preoutput) == 2
-			(i1, char1) = preoutput[1]
-			(i2, char2) = preoutput[2]
-			if char1 == char2
-				n = count(w.word, char1)
-				if n == 2
-					output[i1] = 2
-					output[i2] = 1
-				end
-			end
-		end
+        function process_preoutput(preoutput, output, secretchars)
+            if length(preoutput) == 1
+                (i, char) = preoutput[1]
+                output[i] = 2
+            elseif length(preoutput) == 2
+                (i1, char1) = preoutput[1]
+                (i2, char2) = preoutput[2]
+                if char1 == char2
+                    n = count(secretchars, char1)
+                    if n == 2
+                        output[i1] = 2
+                        output[i2] = 1
+                    else
+                        output[i1] = 2
+                        output[i2] = 2
+                    end
+                else
+                    output[i1] = 2
+                    output[i2] = 2
+                end
+            elseif length(preoutput) == 3
+                (i1, char1) = preoutput[1]
+                (i2, char2) = preoutput[2]
+                (i3, char3) = preoutput[3]
+                if char1 == char2 && char2 == char3
+                    n = count(secretchars, char1)
+                    if n == 3
+                        output[i1] = 2
+                        output[i2] = 2
+                        output[i3] = 1
+                    else
+                        output[i1] = 2
+                        output[i2] = 2
+                        output[i3] = 2
+                    end
+                elseif char1 == char2
+                    n = count(secretchars, char1)
+                    if n == 2
+                        output[i1] = 2
+                        output[i2] = 2
+                        output[i3] = 0
+                    else
+                        output[i1] = 2
+                        output[i2] = 2
+                        output[i3] = 2
+                    end
+                elseif char2 == char3
+                    n = count(secretchars, char2)
+                    if n == 2
+                        output[i1] = 0
+                        output[i2] = 2
+                        output[i3] = 2
+                    else
+                        output[i1] = 2
+                        output[i2] = 2
+                        output[i3] = 2
+                    end
+                elseif char1 == char3
+                    n = count(secretchars, char1)
+                    if n == 2
+                        output[i1] = 2
+                        output[i2] = 0
+                        output[i3] = 2
+                    else
+                        output[i1] = 2
+                        output[i2] = 2
+                        output[i3] = 2
+                    end
+                else
+                    output[i1] = 2
+                    output[i2] = 2
+                    output[i3] = 2
+                end
+            elseif length(preoutput) == 4
+                (i1, char1) = preoutput[1]
+                (i2, char2) = preoutput[2]
+                (i3, char3) = preoutput[3]
+                (i4, char4) = preoutput[4]
+                chars = [char1, char2, char3, char4]
+                unique_chars = unique(chars)
+                for char in unique_chars
+                    indices = findall(x -> x == char, chars)
+                    n = count(secretchars, char)
+                    if length(indices) <= n
+                        for idx in indices
+                            output[preoutput[idx][1]] = 2
+                        end
+                    else
+                        for idx in indices
+                            output[preoutput[idx][1]] = 1
+                        end
+                    end
+                end
+            elseif length(preoutput) == 5
+                (i1, char1) = preoutput[1]
+                (i2, char2) = preoutput[2]
+                (i3, char3) = preoutput[3]
+                (i4, char4) = preoutput[4]
+                (i5, char5) = preoutput[5]
+                chars = [char1, char2, char3, char4, char5]
+                unique_chars = unique(chars)
+                for char in unique_chars
+                    indices = findall(x -> x == char, chars)
+                    n = count(secretchars, char)
+                    if length(indices) <= n
+                        for idx in indices
+                            output[preoutput[idx][1]] = 2
+                        end
+                    else
+                        for idx in indices
+                            output[preoutput[idx][1]] = 1
+                        end
+                    end
+                end
+            end
+        end
 
-		return output
+        process_preoutput(preoutput, output, secretchars)
+        
+        return output
+    end
+end
+
+# ╔═╡ 28994152-5971-4cbf-b298-5f3fe7cc0336
+function play(word)
+	
+	result = compare_words(word)
+    
+    output = String[]
+    
+    for k in 1:5
+        if result[k] == 0
+            push!(output, "$(word[k]) 🔳")
+        elseif result[k] == 1
+            push!(output, "$(word[k]) 🟩")
+        elseif result[k] == 2
+            push!(output, "$(word[k]) 🟨")
+        end
+    end
+	
+	g = w.graphics 
+	l = length(w.guesses)
+	if l < 7
+		g[l] = output
+	else
+		println("You lost, the word was $(w.word)")
+		println(" ")
+	end
+
+	for guess in g
+		if length(guess) > 0
+			println(guess)
+		end
 	end
 end
 
@@ -298,7 +434,8 @@ function run_solver()
 	@show word
 	
 	while true
-        r = compare_words(word)
+		
+		r = compare_words(word)
 		
         if r == [1, 1, 1, 1, 1]
 			println("found")
@@ -321,34 +458,9 @@ $(@bind word confirm(TextField(default="crane")))
 
 # I have set "crane" by default because it is the word that will have a greater probability to give a lot of informations.
 
-# ╔═╡ 11844a36-c8ee-4d10-b78e-bf1c8d444e04
-w.word
-
 # ╔═╡ d204f0f2-55a3-4076-961a-4075cde5c52d
 begin
-    result = compare_words(word)
-    
-    output = String[]
-    
-    for k in 1:5
-        if result[k] == 0
-            push!(output, "$(word[k]) 🔳")
-        elseif result[k] == 1
-            push!(output, "$(word[k]) 🟩")
-        elseif result[k] == 2
-            push!(output, "$(word[k]) 🟨")
-        end
-    end
-	
-	g = w.graphics 
-	l = length(w.guesses)
-	g[l] = output
-
-	for guess in g
-		if length(guess) > 0
-			println(guess)
-		end
-	end
+	play(word)
 end
 
 # ╔═╡ 0b983516-022a-4772-965f-4b702f2ee8d2
@@ -367,7 +479,8 @@ solver() # To get the possibilities
 # ╟─6cb7b734-508c-46a8-b014-68ba8069282e
 # ╟─2d8cfc6f-ab0b-4bfc-aa4e-5bf14b2003a7
 # ╟─354bf5cb-7f4d-4a60-a69e-3f22b44e03d0
-# ╟─10b2959a-2925-4254-8954-724665099ec7
+# ╟─fdf7557e-37cb-44c1-8546-c518592279bb
+# ╟─28994152-5971-4cbf-b298-5f3fe7cc0336
 # ╟─d0de1a34-eeed-4817-8aa3-81d1e57b656e
 # ╟─a7219f5a-f24e-483b-800f-60cfb4a7307d
 # ╟─e0cf84bf-15b0-4bdb-86a4-a9076237e552
@@ -375,7 +488,6 @@ solver() # To get the possibilities
 # ╟─442b85d5-2f8c-4549-a3c1-1d8e1fd7e458
 # ╟─9d1dabc1-3c3d-4edf-9519-e0b643445fb1
 # ╟─0b275ad6-74ff-4189-9b7c-37cc51f6d118
-# ╠═11844a36-c8ee-4d10-b78e-bf1c8d444e04
-# ╟─d204f0f2-55a3-4076-961a-4075cde5c52d
+# ╠═d204f0f2-55a3-4076-961a-4075cde5c52d
 # ╠═0b983516-022a-4772-965f-4b702f2ee8d2
 # ╠═63bd33e1-5cf2-4786-8bf2-2247ed648e53
