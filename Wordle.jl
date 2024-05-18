@@ -136,14 +136,14 @@ secret_word()
 function compare_words(guess)
 
 	path = joinpath(splitdir(@__FILE__)[1], "Wordle.txt")
-	test1 = 0
+	test = 0
 	for line in eachline(joinpath(path))
 		if line == guess # Verify if the provided word exist in the list
-			test1 += 1
+			test += 1
 		end
 	end
 
-	if test1 == 0
+	if test == 0
 		println("The choosen word is not in the list.")
 	else
 
@@ -172,24 +172,35 @@ function compare_words(guess)
 				
 				if (i, char) ∉ w.correct
 					push!(w.correct, (i, char))
-					n = count(w.word, char) # To know how many 'char' in the word
-					test2 = 0
+					n = count(w.word, char)
+					test = 0
 					for correct in w.correct
 						if correct[2] == char
-							test2 += 1 # To know how many 'char' have been correct
+							test += 1
 						end
 					end
-					if n == test2 # If all the 'i' have been found, remove 'char'
+					if n == test # If all the 'i' have been found, remove 'char'
 						filter!(x -> x != char, w.inword)
 					end
 				end
 				
 			elseif secretchars[i] != char && char ∈ w.word
 				output[i] = 2 # 2 if in the word but not at the right place
+				n = count(w.word, char)
+				test = 0
+				for correct in w.correct
+					if correct[2] == char
+						test += 1
+					end
+				end
+				if n == test
+					output[i] = 0
+				end
+				
 				if char ∉ w.inword
 					push!(w.inword, char)
 				end
-
+				
 				d = w.posnot
 				if i ∉ values(d[char])
 					push!(values(d[char]), i) # Add the index in w.posnot('char')
@@ -289,7 +300,7 @@ Put your guess here:
 $(@bind word confirm(TextField(default="crane")))
 """
 
-# I have set crane by default because it is the word that will have a greater probability to give a lot of informations. 
+# I have set "crane" by default because it is the word that will have a greater probability to give a lot of informations.
 
 # ╔═╡ d204f0f2-55a3-4076-961a-4075cde5c52d
 begin
