@@ -157,12 +157,14 @@ function compare_words(guess)
 		guesschars = collect(guess)
 	
 		output = [0, 0, 0, 0, 0]
+		preoutput = []
 		
 		for i in 1:5
 			char = guesschars[i]
 			
 			if char ∉ w.word
 				output[i] = 0 # 0 if the letter is not in the word
+				
 				if char ∉ w.notin
 					push!(w.notin, char)
 				end
@@ -185,7 +187,8 @@ function compare_words(guess)
 				end
 				
 			elseif secretchars[i] != char && char ∈ w.word
-				output[i] = 2 # 2 if in the word but not at the right place
+				push!(preoutput, (i, char))
+					
 				n = count(w.word, char)
 				test = 0
 				for correct in w.correct
@@ -207,7 +210,23 @@ function compare_words(guess)
 				end
 			end
 		end
-	
+
+		if length(preoutput) == 1
+			(i, char) = preoutput[1]
+			output[i] = 2
+			
+		elseif length(preoutput) == 2
+			(i1, char1) = preoutput[1]
+			(i2, char2) = preoutput[2]
+			if char1 == char2
+				n = count(w.word, char1)
+				if n == 2
+					output[i1] = 2
+					output[i2] = 1
+				end
+			end
+		end
+
 		return output
 	end
 end
@@ -302,6 +321,9 @@ $(@bind word confirm(TextField(default="crane")))
 
 # I have set "crane" by default because it is the word that will have a greater probability to give a lot of informations.
 
+# ╔═╡ 11844a36-c8ee-4d10-b78e-bf1c8d444e04
+w.word
+
 # ╔═╡ d204f0f2-55a3-4076-961a-4075cde5c52d
 begin
     result = compare_words(word)
@@ -317,7 +339,7 @@ begin
             push!(output, "$(word[k]) 🟨")
         end
     end
-
+	
 	g = w.graphics 
 	l = length(w.guesses)
 	g[l] = output
@@ -328,7 +350,6 @@ begin
 		end
 	end
 end
-
 
 # ╔═╡ 0b983516-022a-4772-965f-4b702f2ee8d2
 solver() # To get the possibilities
@@ -354,6 +375,7 @@ solver() # To get the possibilities
 # ╟─442b85d5-2f8c-4549-a3c1-1d8e1fd7e458
 # ╟─9d1dabc1-3c3d-4edf-9519-e0b643445fb1
 # ╟─0b275ad6-74ff-4189-9b7c-37cc51f6d118
+# ╠═11844a36-c8ee-4d10-b78e-bf1c8d444e04
 # ╟─d204f0f2-55a3-4076-961a-4075cde5c52d
 # ╠═0b983516-022a-4772-965f-4b702f2ee8d2
 # ╠═63bd33e1-5cf2-4786-8bf2-2247ed648e53
