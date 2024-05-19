@@ -177,7 +177,7 @@ function compare_words(guess)
 				if (i, char) ∉ w.correct
 					push!(w.correct, (i, char))
 					n = count(w.word, char)
-					n3 = count(collect(test2), char)
+					n3 = count(test2, char)
 					
 					if n == n3 # If all the 'i' have been found, remove 'char'
 						filter!(x -> x != char, w.inword)
@@ -187,26 +187,52 @@ function compare_words(guess)
 			elseif secretchars[i] != char
 				n = count(w.word, char)
 				n2 = count(w.guess, char)
-				n3 = count(collect(test), char) # Number found
+				n3 = count(test2, char) # Number found
 				
-				if n >= n3
+				if n > n3
 					if n2 >= n
 						push!(test1, char)
-						if count(collect(test1), char) <= n
+						if count(test1, char) <= n
 							output[i] = 2 # 2 if the letter is in the word but
 						end
 					end
 				end
+				
+				d = w.posnot
+				if i ∉ values(d[char])
+					push!(values(d[char]), i) # Add the index in w.posnot('char')
+				end
+
+				if char ∉ w.inword
+					push!(w.inword, char)
+				end
+			end
+		end
+
+		for char in w.guess
+			n = count(w.word, char)
+			n2 = count(w.guess, char)
+			n3 = count(test2, char)
+			
+			idx1 = 0 # Position 'char' in 'w.word'
+			idx2 = 0 # First position 'char' in 'w.guess'
+			for i in 1:5
+				if w.word[i] == char
+					idx1 = i
+					break
+				end
+				if w.guess[i] == char
+					idx2 = i
+				end
 			end
 			
-			if char ∉ w.inword
-				push!(w.inword, char)
+			if n2 > 1 && n2 > n
+				if n3 > 0 && n3 == n # If we already found all
+					println("test")
+					output[idx2] = 0
+				end
 			end
-				
-			d = w.posnot
-			if i ∉ values(d[char])
-				push!(values(d[char]), i) # Add the index in w.posnot('char')
-			end
+			
 		end
 	end
         
@@ -345,6 +371,12 @@ begin
 	play(word)
 end
 
+# ╔═╡ 32046728-bc27-474b-95f7-116208252862
+begin
+	word
+	md"""Number of possibilities: **$(length(solver()))**"""
+end
+
 # ╔═╡ 0b983516-022a-4772-965f-4b702f2ee8d2
 solver() # To get the possibilities
 
@@ -394,7 +426,7 @@ end
 # ╟─6cb7b734-508c-46a8-b014-68ba8069282e
 # ╟─2d8cfc6f-ab0b-4bfc-aa4e-5bf14b2003a7
 # ╟─354bf5cb-7f4d-4a60-a69e-3f22b44e03d0
-# ╟─fdf7557e-37cb-44c1-8546-c518592279bb
+# ╠═fdf7557e-37cb-44c1-8546-c518592279bb
 # ╟─28994152-5971-4cbf-b298-5f3fe7cc0336
 # ╟─d0de1a34-eeed-4817-8aa3-81d1e57b656e
 # ╟─a7219f5a-f24e-483b-800f-60cfb4a7307d
@@ -405,6 +437,7 @@ end
 # ╟─0b275ad6-74ff-4189-9b7c-37cc51f6d118
 # ╠═7cd90e2c-ade4-4c16-b3d6-d37baa99f027
 # ╟─d204f0f2-55a3-4076-961a-4075cde5c52d
+# ╟─32046728-bc27-474b-95f7-116208252862
 # ╠═0b983516-022a-4772-965f-4b702f2ee8d2
 # ╠═63bd33e1-5cf2-4786-8bf2-2247ed648e53
 # ╠═c09180da-b338-4002-b3ca-d9a735cd104a
