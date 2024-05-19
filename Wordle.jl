@@ -469,6 +469,38 @@ solver() # To get the possibilities
 # ╔═╡ 63bd33e1-5cf2-4786-8bf2-2247ed648e53
 #run_solver()
 
+# ╔═╡ c09180da-b338-4002-b3ca-d9a735cd104a
+begin
+
+# I used this for the 19/05/2024 Wordle with 'crane' and 'split' as openers.
+
+	array = String[]
+	path = joinpath(splitdir(@__FILE__)[1], "Wordle.txt")
+	
+	for line in eachline(path)
+		if 'c' in line && 'i' in line && 't' in line
+			push!(array, line)
+		end
+	end
+end
+
+# ╔═╡ 38e85d6d-4d44-4586-87df-daeace59ef37
+begin
+	for pos in array
+			for char in ['r', 'a', 'n', 'e', 's', 'p', 'l']
+				if char in pos
+					filter!(x -> x != pos, array)
+				end
+			end
+		end
+	
+		
+	
+		for pos in array
+			println(pos)
+		end
+end
+
 # ╔═╡ Cell order:
 # ╟─ff5f621c-8c9f-48d9-a184-57fefaa4fe9b
 # ╟─c8d48230-1464-11ef-0630-b98de5d1ae8d
@@ -488,6 +520,8 @@ solver() # To get the possibilities
 # ╟─442b85d5-2f8c-4549-a3c1-1d8e1fd7e458
 # ╟─9d1dabc1-3c3d-4edf-9519-e0b643445fb1
 # ╟─0b275ad6-74ff-4189-9b7c-37cc51f6d118
-# ╠═d204f0f2-55a3-4076-961a-4075cde5c52d
+# ╟─d204f0f2-55a3-4076-961a-4075cde5c52d
 # ╠═0b983516-022a-4772-965f-4b702f2ee8d2
 # ╠═63bd33e1-5cf2-4786-8bf2-2247ed648e53
+# ╠═c09180da-b338-4002-b3ca-d9a735cd104a
+# ╠═38e85d6d-4d44-4586-87df-daeace59ef37
