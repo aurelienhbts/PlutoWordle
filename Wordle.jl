@@ -157,7 +157,8 @@ function compare_words(guess)
 		guesschars = collect(guess)
 	
 		output = [0, 0, 0, 0, 0]
-		preoutput = []
+		test1 = [] # All the inword will go there
+		test2 = [] # All the correct will go there
 		
 		for i in 1:5
 			char = guesschars[i]
@@ -170,168 +171,46 @@ function compare_words(guess)
 				end
 				
 			elseif secretchars[i] == char
+				push!(test2, char)
 				output[i] = 1 # 1 if the letter is at the correct place
 				
 				if (i, char) ∉ w.correct
 					push!(w.correct, (i, char))
 					n = count(w.word, char)
-					test = 0
-					for correct in w.correct
-						if correct[2] == char
-							test += 1
-						end
-					end
-					if n == test # If all the 'i' have been found, remove 'char'
+					n3 = count(collect(test2), char)
+					
+					if n == n3 # If all the 'i' have been found, remove 'char'
 						filter!(x -> x != char, w.inword)
 					end
 				end
 				
-			elseif secretchars[i] != char && char ∈ w.word
-				push!(preoutput, (i, char))
-					
+			elseif secretchars[i] != char
 				n = count(w.word, char)
-				test = 0
-				for correct in w.correct
-					if correct[2] == char
-						test += 1
+				n2 = count(w.guess, char)
+				n3 = count(collect(test), char) # Number found
+				
+				if n >= n3
+					if n2 >= n
+						push!(test1, char)
+						if count(collect(test1), char) <= n
+							output[i] = 2 # 2 if the letter is in the word but
+						end
 					end
 				end
-				if n > 1 && n == test
-					output[i] = 0
-				end
+			end
+			
+			if char ∉ w.inword
+				push!(w.inword, char)
+			end
 				
-				if char ∉ w.inword
-					push!(w.inword, char)
-				end
-				
-				d = w.posnot
-				if i ∉ values(d[char])
-					push!(values(d[char]), i) # Add the index in w.posnot('char')
-				end
+			d = w.posnot
+			if i ∉ values(d[char])
+				push!(values(d[char]), i) # Add the index in w.posnot('char')
 			end
 		end
-
-        function process_preoutput(preoutput, output, secretchars)
-            if length(preoutput) == 1
-                (i, char) = preoutput[1]
-                output[i] = 2
-            elseif length(preoutput) == 2
-                (i1, char1) = preoutput[1]
-                (i2, char2) = preoutput[2]
-                if char1 == char2
-                    n = count(secretchars, char1)
-                    if n == 2
-                        output[i1] = 2
-                        output[i2] = 1
-                    else
-                        output[i1] = 2
-                        output[i2] = 2
-                    end
-                else
-                    output[i1] = 2
-                    output[i2] = 2
-                end
-            elseif length(preoutput) == 3
-                (i1, char1) = preoutput[1]
-                (i2, char2) = preoutput[2]
-                (i3, char3) = preoutput[3]
-                if char1 == char2 && char2 == char3
-                    n = count(secretchars, char1)
-                    if n == 3
-                        output[i1] = 2
-                        output[i2] = 2
-                        output[i3] = 1
-                    else
-                        output[i1] = 2
-                        output[i2] = 2
-                        output[i3] = 2
-                    end
-                elseif char1 == char2
-                    n = count(secretchars, char1)
-                    if n == 2
-                        output[i1] = 2
-                        output[i2] = 2
-                        output[i3] = 0
-                    else
-                        output[i1] = 2
-                        output[i2] = 2
-                        output[i3] = 2
-                    end
-                elseif char2 == char3
-                    n = count(secretchars, char2)
-                    if n == 2
-                        output[i1] = 0
-                        output[i2] = 2
-                        output[i3] = 2
-                    else
-                        output[i1] = 2
-                        output[i2] = 2
-                        output[i3] = 2
-                    end
-                elseif char1 == char3
-                    n = count(secretchars, char1)
-                    if n == 2
-                        output[i1] = 2
-                        output[i2] = 0
-                        output[i3] = 2
-                    else
-                        output[i1] = 2
-                        output[i2] = 2
-                        output[i3] = 2
-                    end
-                else
-                    output[i1] = 2
-                    output[i2] = 2
-                    output[i3] = 2
-                end
-            elseif length(preoutput) == 4
-                (i1, char1) = preoutput[1]
-                (i2, char2) = preoutput[2]
-                (i3, char3) = preoutput[3]
-                (i4, char4) = preoutput[4]
-                chars = [char1, char2, char3, char4]
-                unique_chars = unique(chars)
-                for char in unique_chars
-                    indices = findall(x -> x == char, chars)
-                    n = count(secretchars, char)
-                    if length(indices) <= n
-                        for idx in indices
-                            output[preoutput[idx][1]] = 2
-                        end
-                    else
-                        for idx in indices
-                            output[preoutput[idx][1]] = 1
-                        end
-                    end
-                end
-            elseif length(preoutput) == 5
-                (i1, char1) = preoutput[1]
-                (i2, char2) = preoutput[2]
-                (i3, char3) = preoutput[3]
-                (i4, char4) = preoutput[4]
-                (i5, char5) = preoutput[5]
-                chars = [char1, char2, char3, char4, char5]
-                unique_chars = unique(chars)
-                for char in unique_chars
-                    indices = findall(x -> x == char, chars)
-                    n = count(secretchars, char)
-                    if length(indices) <= n
-                        for idx in indices
-                            output[preoutput[idx][1]] = 2
-                        end
-                    else
-                        for idx in indices
-                            output[preoutput[idx][1]] = 1
-                        end
-                    end
-                end
-            end
-        end
-
-        process_preoutput(preoutput, output, secretchars)
+	end
         
-        return output
-    end
+    return output
 end
 
 # ╔═╡ 28994152-5971-4cbf-b298-5f3fe7cc0336
@@ -458,6 +337,9 @@ $(@bind word confirm(TextField(default="crane")))
 
 # I have set "crane" by default because it is the word that will have a greater probability to give a lot of informations.
 
+# ╔═╡ 7cd90e2c-ade4-4c16-b3d6-d37baa99f027
+w.word
+
 # ╔═╡ d204f0f2-55a3-4076-961a-4075cde5c52d
 begin
 	play(word)
@@ -473,6 +355,7 @@ solver() # To get the possibilities
 begin
 
 # I used this for the 19/05/2024 Wordle with 'crane' and 'split' as openers.
+	# The bot from the game said that 'spoil' was a beter 2nd opener.
 
 	array = String[]
 	path = joinpath(splitdir(@__FILE__)[1], "Wordle.txt")
@@ -520,6 +403,7 @@ end
 # ╟─442b85d5-2f8c-4549-a3c1-1d8e1fd7e458
 # ╟─9d1dabc1-3c3d-4edf-9519-e0b643445fb1
 # ╟─0b275ad6-74ff-4189-9b7c-37cc51f6d118
+# ╠═7cd90e2c-ade4-4c16-b3d6-d37baa99f027
 # ╟─d204f0f2-55a3-4076-961a-4075cde5c52d
 # ╠═0b983516-022a-4772-965f-4b702f2ee8d2
 # ╠═63bd33e1-5cf2-4786-8bf2-2247ed648e53
