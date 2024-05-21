@@ -225,11 +225,13 @@ function compare_words(guess)
 					idx2 = i
 				end
 			end
-			
-			if n2 > 1 && n2 > n
-				if n3 > 0 && n3 == n # If we already found all
-					println("test")
-					output[idx2] = 0
+
+			if idx2 != 0
+				if n2 > 1 && n2 > n
+					if n3 > 0 && n3 == n # If we already found all
+						println("test")
+						output[idx2] = 0
+					end
 				end
 			end
 			
@@ -363,9 +365,6 @@ $(@bind word confirm(TextField(default="crane")))
 
 # I have set "crane" by default because it is the word that will have a greater probability to give a lot of informations.
 
-# ╔═╡ 7cd90e2c-ade4-4c16-b3d6-d37baa99f027
-w.word
-
 # ╔═╡ d204f0f2-55a3-4076-961a-4075cde5c52d
 begin
 	play(word)
@@ -435,7 +434,6 @@ end
 # ╟─442b85d5-2f8c-4549-a3c1-1d8e1fd7e458
 # ╟─9d1dabc1-3c3d-4edf-9519-e0b643445fb1
 # ╟─0b275ad6-74ff-4189-9b7c-37cc51f6d118
-# ╠═7cd90e2c-ade4-4c16-b3d6-d37baa99f027
 # ╟─d204f0f2-55a3-4076-961a-4075cde5c52d
 # ╟─32046728-bc27-474b-95f7-116208252862
 # ╠═0b983516-022a-4772-965f-4b702f2ee8d2
