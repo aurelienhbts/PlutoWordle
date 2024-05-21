@@ -382,7 +382,7 @@ solver() # To get the possibilities
 # ╔═╡ 63bd33e1-5cf2-4786-8bf2-2247ed648e53
 #run_solver()
 
-# ╔═╡ c09180da-b338-4002-b3ca-d9a735cd104a
+# ╔═╡ acd82b15-3d9d-4817-8862-8b4979ce974b
 begin
 # I used this for the 19/05/2024 Wordle with 'crane' and 'split' as openers.
 	# The bot from the game said that 'spoil' was a beter 2nd opener.
@@ -399,19 +399,21 @@ end
 
 # ╔═╡ 38e85d6d-4d44-4586-87df-daeace59ef37
 begin
+	# Run this cell until no change
+	
 	for pos in array
-			for char in ['r', 'a', 'n', 'e', 's', 'p', 'l']
-				if char in pos
-					filter!(x -> x != pos, array)
-				end
+		for char in ['r', 'a', 'n', 'e', 's', 'p', 'l']
+			if char in pos
+				filter!(x -> x != pos, array)
 			end
 		end
+	end
 	
 		
 	
-		for pos in array
-			println(pos)
-		end
+	for pos in array
+		println(pos)
+	end
 end
 
 # ╔═╡ Cell order:
@@ -424,7 +426,7 @@ end
 # ╟─6cb7b734-508c-46a8-b014-68ba8069282e
 # ╟─2d8cfc6f-ab0b-4bfc-aa4e-5bf14b2003a7
 # ╟─354bf5cb-7f4d-4a60-a69e-3f22b44e03d0
-# ╠═fdf7557e-37cb-44c1-8546-c518592279bb
+# ╟─fdf7557e-37cb-44c1-8546-c518592279bb
 # ╟─28994152-5971-4cbf-b298-5f3fe7cc0336
 # ╟─d0de1a34-eeed-4817-8aa3-81d1e57b656e
 # ╟─a7219f5a-f24e-483b-800f-60cfb4a7307d
@@ -437,5 +439,5 @@ end
 # ╟─32046728-bc27-474b-95f7-116208252862
 # ╠═0b983516-022a-4772-965f-4b702f2ee8d2
 # ╠═63bd33e1-5cf2-4786-8bf2-2247ed648e53
-# ╠═c09180da-b338-4002-b3ca-d9a735cd104a
+# ╠═acd82b15-3d9d-4817-8862-8b4979ce974b
 # ╠═38e85d6d-4d44-4586-87df-daeace59ef37
