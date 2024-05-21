@@ -190,10 +190,10 @@ function compare_words(guess)
 				n3 = count(test2, char) # Number found
 				
 				if n > n3
-					if n2 >= n
+					if char in w.word
 						push!(test1, char)
-						if count(test1, char) <= n
-							output[i] = 2 # 2 if the letter is in the word but
+						if count(test1, char) <= n 
+							output[i] = 2 # 2 if the letter is in the word but...
 						end
 					end
 				end
@@ -384,7 +384,6 @@ solver() # To get the possibilities
 
 # ╔═╡ c09180da-b338-4002-b3ca-d9a735cd104a
 begin
-
 # I used this for the 19/05/2024 Wordle with 'crane' and 'split' as openers.
 	# The bot from the game said that 'spoil' was a beter 2nd opener.
 
